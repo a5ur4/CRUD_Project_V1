@@ -75,6 +75,8 @@ export default function App() {
 
   //Função para exibir os dados do usuário
   //Basta por o nome do usuário e pressionar o botão
+  
+  //inacabado
 
   function readUser() {
     const starCountRef = ref(db, 'Usuários', 'User_1')
