@@ -1,8 +1,7 @@
-import { StatusBar } from 'expo-status-bar';
-import { ref } from 'firebase/database';
-import { doc, setDoc, addDoc, collection, updateDoc } from 'firebase/firestore';
+import { ref, remove } from 'firebase/database';
+import { doc, setDoc, addDoc, collection, updateDoc, getDoc, getDocs, deleteDoc } from 'firebase/firestore';
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { db } from './components/config'
@@ -13,14 +12,6 @@ export default function App() {
   const [email, setEmail] = useState('')
   const [cpf, setCpf] = useState('')
   const [telefone, setTelefone] = useState('')
-  const [errorMessage, setErrorMesssage] = useState(null)
-
-  function verification(){
-    if(username == null && email == null && cpf == null && telefone == null){
-      Vibration.vibrate()
-      setErrorMesssage("Este campo é obrigatório*")
-    }
-  }
 
   //Função para criar usuário
 
@@ -28,22 +19,7 @@ export default function App() {
 
     //Esse o ID é definido no próprio código
 
-      setDoc(doc(db, 'Usuários', 'User_1'), {
-      Username: username,
-      Email: email,
-      CPF: cpf,
-      Telefone: telefone,
-    }).then(() => {
-      alert('Data submitted')
-    })
-      .catch((error)=> {
-        alert(error)
-      })
-
-    //Esse utiliza para definir um ID aleatório, dificultando os outros processos
-    //mas sendo uma opção mais segura e prática
-
-    /*addDoc(collection(db, 'Usuários'), {
+      /*setDoc(doc(db, 'Usuários', 'User_1'), {
       Username: username,
       Email: email,
       CPF: cpf,
@@ -54,13 +30,11 @@ export default function App() {
       .catch((error)=> {
         alert(error)
       })*/
-  }
 
-  //Função para realizar update no regístro
-  //Basta alterar o ID e ele altera tudo dentro dele
+    //Esse utiliza para definir um ID aleatório, dificultando os outros processos
+    //mas sendo uma opção mais segura e prática
 
-  function updateUser(){
-    updateDoc(doc(db, 'Usuários', 'User_1'), {
+    addDoc(collection(db, 'Usuários'), {
       Username: username,
       Email: email,
       CPF: cpf,
@@ -73,99 +47,150 @@ export default function App() {
       })
   }
 
-  //Função para exibir os dados do usuário
-  //Basta por o nome do usuário e pressionar o botão
-  
-  //inacabado
+  //Função para realizar update no regístro
+  //Basta alterar o ID e ele altera tudo dentro dele
 
-  function readUser() {
-    const starCountRef = ref(db, 'Usuários', 'User_1')
-    onValue(starCountRef, (snapshot) => {
-      const data = snapshot.val();
+  function updateUser(){
+    updateDoc(doc(db, 'Usuários/', 'W8PbtFqMLxojPSdkTC2G'), {
+      Username: username,
+      Email: email,
+      CPF: cpf,
+      Telefone: telefone,
+    }).then(() => {
+      alert('Data submitted')
+    })
+      .catch((error)=> {
+        alert(error)
+      })
+  }
 
-      setEmail(data.email)
-    });
+  //Função para exibir os dados dos usuários
+
+  function readAllData(){
+    getDocs(collection(db, 'Usuários')).then(docSnap => {
+      let allData = [] //array vazia para armazenar o DATA
+      docSnap.forEach((doc) => {
+        allData.push({ ...doc.data(), id:doc.id})
+      })
+        console.log('Usuários: ', allData)
+    })
+  }
+
+  //Função para exibir apenas um usuário
+  //Insere o ID do usuário
+
+  function readUser(){
+    getDoc(doc(db, 'Usuários/', 'RuN4Qk9ytlXdVEahn3It')).then(docData => {
+      if(docData.exists()) {
+        console.log(docData.data())
+      } else {
+        alert('ID não encontrado')
+      }
+    }).catch((error)=> {
+      console.log(error)
+    })
+  }
+
+  //Função para deletar o usuário
+  //Insere o ID do usuário
+
+  function deleteUser() {
+    deleteDoc(doc(db, 'Usuários/', 'YOvE2c2Jqmd3Ovyuqp5S'))
+    alert('Usuário removido')
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.Title}>
-        <Text style={styles.TextHead}>Cadastro Cliente</Text>
-        <View style={styles.LineHead_1}></View>
-        <View style={styles.LineHead_2}></View>
-      </View>
-      <View style={styles.InputBox}>
-        <Text style={styles.LabelText}>Nome:</Text>
-        <TextInput
-        style={styles.Input}
-        value={username}
-        onChangeText={(username)=> {
-          setUsername(username)
-        }}
-        placeholder='Insira seu nome aqui...'
-        placeholderTextColor= "#950101"
-        />
+      <Pressable onPress={Keyboard.dismiss} style={styles.PressableContainer}>
+        <View style={styles.Title}>
+          <Text style={styles.TextHead}>Cadastro Cliente</Text>
+          <View style={styles.LineHead_1}></View>
+          <View style={styles.LineHead_2}></View>
+        </View>
+        <View style={styles.InputBox}>
+          <Text style={styles.LabelText}>Nome:</Text>
+          <TextInput
+          style={styles.Input}
+          value={username}
+          onChangeText={(username)=> {
+            setUsername(username)
+          }}
+          placeholder='Insira seu nome aqui...'
+          placeholderTextColor= "#950101"
+          />
 
-        <Text style={styles.LabelText}>Email:</Text>
-        <Text>{errorMessage}</Text>
-        <TextInput
-        style={styles.Input}
-        value={email}
-        onChangeText={(email)=> {
-          setEmail(email)
-        }}
-        placeholder='Insira seu Email aqui...'
-        placeholderTextColor= "#950101"
-        />
+          <Text style={styles.LabelText}>Email:</Text>
+          <TextInput
+          style={styles.Input}
+          value={email}
+          onChangeText={(email)=> {
+            setEmail(email)
+          }}
+          placeholder='Insira seu Email aqui...'
+          placeholderTextColor= "#950101"
+          />
 
-        <Text style={styles.LabelText}>CPF:</Text>
-        <Text>{errorMessage}</Text>
-        <TextInput
-        style={styles.Input}
-        value={cpf}
-        onChangeText={(cpf)=> {
-          setCpf(cpf)
-        }}
-        placeholder='Insira seu CPF aqui...'
-        placeholderTextColor= "#950101"
-        keyboardType='numeric'
-        />
+          <Text style={styles.LabelText}>CPF:</Text>
+          <TextInput
+          style={styles.Input}
+          value={cpf}
+          onChangeText={(cpf)=> {
+            setCpf(cpf)
+          }}
+          placeholder='Insira seu CPF aqui...'
+          placeholderTextColor= "#950101"
+          keyboardType='numeric'
+          />
 
-        <Text style={styles.LabelText}>Telefone:</Text>
-        <Text>{errorMessage}</Text>
-        <TextInput
-        style={styles.Input}
-        value={telefone}
-        onChangeText={(telefone)=> {
-          setTelefone(telefone)
-        }}
-        placeholder='Insira seu telefone aqui...'
-        placeholderTextColor= "#950101"
-        keyboardType='numeric'
-        />
-      </View>
-      <View>
-        <TouchableOpacity 
-        onPress={createUser}
-        style={styles.Button}
-        >
-          <Text style={styles.ButtonText}>Cadastrar usuário</Text>
-        </TouchableOpacity>
+          <Text style={styles.LabelText}>Telefone:</Text>
+          <TextInput
+          style={styles.Input}
+          value={telefone}
+          onChangeText={(telefone)=> {
+            setTelefone(telefone)
+          }}
+          placeholder='Insira seu telefone aqui...'
+          placeholderTextColor= "#950101"
+          keyboardType='numeric'
+          />
+        </View>
+        <View>
+          <TouchableOpacity 
+          onPress={createUser}
+          style={styles.Button}
+          >
+            <Text style={styles.ButtonText}>Cadastrar usuário</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity 
-        onPress={updateUser}
-        style={styles.Button}
-        >
-          <Text style={styles.ButtonText}>Alterar usuário</Text>
-        </TouchableOpacity>
+          <TouchableOpacity 
+          onPress={updateUser}
+          style={styles.Button}
+          >
+            <Text style={styles.ButtonText}>Alterar usuário</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity 
-        onPress={readUser}
-        style={styles.Button}
-        >
-          <Text style={styles.ButtonText}>Mostrar usuário</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity 
+          onPress={readUser}
+          style={styles.Button}
+          >
+            <Text style={styles.ButtonText}>Mostrar apenas um usuário</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+          onPress={readAllData}
+          style={styles.Button}
+          >
+            <Text style={styles.ButtonText}>Mostrar todos os usuário</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+          onPress={deleteUser}
+          style={styles.Button}
+          >
+            <Text style={styles.ButtonText}>Deletar usuário</Text>
+          </TouchableOpacity>
+        </View>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -176,6 +201,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#000000',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+
+  PressableContainer: {
+    alignItems: 'center'
   },
 
   Title: {
