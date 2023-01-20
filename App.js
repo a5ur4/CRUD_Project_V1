@@ -51,7 +51,7 @@ export default function App() {
   //Basta alterar o ID e ele altera tudo dentro dele
 
   function updateUser(){
-    updateDoc(doc(db, 'Usuários/', 'W8PbtFqMLxojPSdkTC2G'), {
+    updateDoc(doc(db, 'Usuários/', 'hvugCilV9qRcF1Xtui0K'), {
       Username: username,
       Email: email,
       CPF: cpf,
@@ -80,7 +80,7 @@ export default function App() {
   //Insere o ID do usuário
 
   function readUser(){
-    getDoc(doc(db, 'Usuários/', 'RuN4Qk9ytlXdVEahn3It')).then(docData => {
+    getDoc(doc(db, 'Usuários/', 'hvugCilV9qRcF1Xtui0K')).then(docData => {
       if(docData.exists()) {
         console.log(docData.data())
       } else {
@@ -95,7 +95,7 @@ export default function App() {
   //Insere o ID do usuário
 
   function deleteUser() {
-    deleteDoc(doc(db, 'Usuários/', 'YOvE2c2Jqmd3Ovyuqp5S'))
+    deleteDoc(doc(db, 'Usuários/', '5eY5GvIZSCh1hSD5FcKz'))
     alert('Usuário removido')
   }
 
